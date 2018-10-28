@@ -4,6 +4,7 @@ export class GoodsModel {
   public Name: string;
   public Cost: number;
   public ShelfLife: number;
+  public CurrentShelfLife: number;
   public Quantity: number;
   public BuyPerDay: number;
   public OnShelfAmount: number;
