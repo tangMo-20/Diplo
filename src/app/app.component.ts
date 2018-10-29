@@ -40,6 +40,8 @@ export class AppComponent implements OnInit {
         // Вычисление ожидаемой прибыли для конкретной партии товаров
         // Ожидаемая прибыль расчитывается исходя из спроса на товары
         this.expectedProfit[good_number] = this.goods[good_number].BuyPerDay * this.goods[good_number].Cost;
+        // Вычисление финальной ожидаемой прибыли
+        this.fullExpectedProfit += this.expectedProfit[good_number];
 
         // Проверка срока годности партии товаров
         // TODO: Заранее предупреждать об истекании срока годности товара
@@ -52,6 +54,7 @@ export class AppComponent implements OnInit {
           console.log('|*|ПРОСРОЧЕН|*| Партия товара ' + this.goods[good_number].Name
             + ' в количестве ' + this.goods[good_number].Quantity + ' единиц, просрочилась. Потери в прибыли составили (' +
             this.currentProfit[good_number] + ')');
+          this.profit += this.currentProfit[good_number];
           // TODO: Рекомендации по корректировке поставок товара ( поставлять меньше )
           // TODO: **Обрабатывать значение потерь в прибыли ( Реализована разница в финальных реальной и ожидаемой прибылях )
         }
@@ -77,7 +80,7 @@ export class AppComponent implements OnInit {
             this.goods[good_number].Quantity -= this.goods[good_number].BuyPerDay;
             this.currentProfit[good_number] = this.goods[good_number].BuyPerDay * this.goods[good_number].Cost;
             this.profit += this.currentProfit[good_number];
-            this.fullExpectedProfit += this.expectedProfit[good_number];
+
           }
           // Проверка, хватит ли товара со склада, чтобы заполнить все полки в зале
           // при условии, что потребности в товаре будет больше, чем есть на полках
@@ -89,7 +92,6 @@ export class AppComponent implements OnInit {
             this.goods[good_number].Quantity -= this.goods[good_number].OnShelfAmount;
             this.currentProfit[good_number] = this.goods[good_number].OnShelfAmount * this.goods[good_number].Cost;
             this.profit += this.currentProfit[good_number];
-            this.fullExpectedProfit += this.expectedProfit[good_number];
           }
           // Ситуация, когда товара со склада недостаточно, чтобы заполнить все полки в зале
           else if (this.goods[good_number].Quantity < this.goods[good_number].OnShelfAmount) {
@@ -98,13 +100,11 @@ export class AppComponent implements OnInit {
               this.goods[good_number].Quantity -= this.goods[good_number].BuyPerDay;
               this.currentProfit[good_number] = this.goods[good_number].BuyPerDay * this.goods[good_number].Cost;
               this.profit += this.currentProfit[good_number];
-              this.fullExpectedProfit += this.expectedProfit[good_number];
             }
             // Ситуация, когда товара со склада меньше, чем потребности в товаре
             else if (this.goods[good_number].Quantity < this.goods[good_number].BuyPerDay) {
               this.currentProfit[good_number] = this.goods[good_number].Quantity * this.goods[good_number].Cost;
               this.profit += this.currentProfit[good_number];
-              this.fullExpectedProfit += this.expectedProfit[good_number];
               this.goods[good_number].Quantity = 0;
               this.goods[good_number].isValid = false;
               this.goods[good_number].notValidReason = 'Товар закончился';
@@ -119,7 +119,6 @@ export class AppComponent implements OnInit {
             good_number++;
           } else if (this.currentProfit[good_number] < this.expectedProfit[good_number]) {
             let difference = this.expectedProfit[good_number] - this.currentProfit[good_number];
-            this.fullDifference += difference;
             console.log('|*|ПРИБЫЛЬ|*| Реальная частная прибыль (' + this.currentProfit[good_number] +
               ') для товара ' + this.goods[good_number].Name + ' оказалась меньше ожидаемой (' + this.expectedProfit[good_number] +
               '), разница составила (' + difference + ')');
@@ -142,6 +141,7 @@ export class AppComponent implements OnInit {
     if (this.profit === this.fullExpectedProfit) {
       console.log('|*|ПРИБЫЛЬ|*| Финальная реальная прибыль (' + this.profit + ') совпала с ожидаемой');
     } else if (this.profit < this.fullExpectedProfit) {
+      this.fullDifference = this.fullExpectedProfit - this.profit;
       console.log('|*|ПРИБЫЛЬ|*| Финальная реальная прибыль (' + this.profit + ') оказалась меньше ожидаемой (' +
         this.fullExpectedProfit + '), разница составила (' + this.fullDifference + ')');
     }
