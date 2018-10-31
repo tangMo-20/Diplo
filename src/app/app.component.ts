@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
         this.fullExpectedProfit += this.expectedProfit[good_number];
 
         // Проверка срока годности партии товаров
-        // TODO: Заранее предупреждать об истекании срока годности товара
+        // TODO: Заранее предупреждать об истекании срока годности товара ( увеличить вместимость полок )
         if (this.goods[good_number].CurrentShelfLife > 0) {
           this.goods[good_number].CurrentShelfLife--;
         } else {
