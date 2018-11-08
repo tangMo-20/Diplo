@@ -2,6 +2,8 @@ export class GoodsModel {
   [key: string]: any;
   public Id: string;
   public Name: string;
+  public Category: number;
+  public PrimeCost: number;
   public Cost: number;
   public ShelfLife: number;
   public CurrentShelfLife: number;

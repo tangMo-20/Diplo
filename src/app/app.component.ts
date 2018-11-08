@@ -8,13 +8,17 @@ import {GoodsModel} from 'src/app/models/goods.model';
 })
 export class AppComponent implements OnInit {
 
-  day = 1;
+  day: number = 1;
   goods: Array<GoodsModel> = [];
-  profit = 0;
-  fullExpectedProfit = 0;
-  fullDifference = 0;
+
+  profit: number = 0;
+  fullExpectedProfit: number = 0;
+  fullDifference: number = 0;
   currentProfit: Array<number> = [];
   expectedProfit: Array<number> = [];
+
+  maxOnShelfAmount: number = 50;
+  maxQuantity: number = 500;
 
   constructor() {
 
@@ -25,7 +29,21 @@ export class AppComponent implements OnInit {
     this.mainLoop();
   }
 
-  mainLoop() {
+  getGeneralParameters = () => {
+    return {
+      day: this.day,
+      goods: this.goods,
+      profit: this.profit,
+      fullExpectedProfit: this.fullExpectedProfit,
+      fullDifference: this.fullDifference,
+      currentProfit: this.currentProfit,
+      expectedProfit: this.expectedProfit,
+      maxOnShelfAmount: this.maxOnShelfAmount,
+      maxQuantity: this.maxQuantity,
+    };
+  };
+
+  mainLoop = () => {
     // Цикл, имитирующий течение времени ( по дням )
     while (this.day <= 5) {
       // Номер партии товаров
@@ -133,6 +151,8 @@ export class AppComponent implements OnInit {
       }
 
       // TODO: Реализовать динамический спрос на товары
+      // TODO: Реализовать динамическое изменение кол-ва товаров на полках
+      // TODO: Ввести себестоимость в алгоритм
       this.day++;
     }
 
@@ -145,26 +165,31 @@ export class AppComponent implements OnInit {
       console.log('|*|ПРИБЫЛЬ|*| Финальная реальная прибыль (' + this.profit + ') оказалась меньше ожидаемой (' +
         this.fullExpectedProfit + '), разница составила (' + this.fullDifference + ')');
     }
-  }
+  };
 
-  generateGoods() {
+  generateGoods = () => {
     let i = 0;
-    while (i < 10) {
+    let goodsToGenerate = 10;
+    while (i < goodsToGenerate) {
       this.goods[i] = new GoodsModel();
       this.goods[i].Id = (i + 1).toString();
       this.goods[i].Name = 'Good number ' + (i + 1);
-      this.goods[i].Cost = Math.floor(Math.random() * 1000) + 1;
+      // this.goods[i].Category = Math.floor(Math.random() * 5) + 1;
+      this.goods[i].PrimeCost = Math.floor(Math.random() * 1000) + 1;
+      this.goods[i].Cost = Math.floor(this.goods[i].PrimeCost * (Math.random() + 1));
       this.goods[i].ShelfLife = Math.floor(Math.random() * 20) + 1;
       this.goods[i].CurrentShelfLife = this.goods[i].ShelfLife;
-      this.goods[i].Quantity = Math.floor(Math.random() * 50) + 1;
+      this.goods[i].Quantity = Math.floor(this.maxQuantity / goodsToGenerate);
+      // this.goods[i].Quantity = Math.floor(Math.random() * 50) + 1;
       this.goods[i].BuyPerDay = Math.floor(Math.random() * 10);
-      this.goods[i].OnShelfAmount = Math.floor(Math.random() * 10) + 1;
+      this.goods[i].OnShelfAmount = Math.floor(this.maxOnShelfAmount / goodsToGenerate);
+      // this.goods[i].OnShelfAmount = Math.floor(Math.random() * 10) + 1;
       this.goods[i].isValid = true;
       this.goods[i].notValidReason = '-';
       i++;
     }
     console.log(this.goods);
-  }
+  };
 
 
 }
