@@ -8,17 +8,21 @@ import {GoodsModel} from '../../../models/goods.model';
 })
 export class GoodsListHeaderComponent implements OnInit {
 
-  @Input() goods: Array<GoodsModel>;
+  @Input() good: GoodsModel;
   propertyArray = [];
 
   constructor() { }
 
   ngOnInit() {
+    this.dynamicRender();
+  }
+
+  dynamicRender = () => {
     let i = 0;
-    Object.keys(this.goods[0]).map((key: string) => {
+    Object.keys(this.good).map((key: string) => {
       this.propertyArray[i] = key.replace(/[\s_]+|([a-z0-9])(?=[A-Z])/g, "$1 ");
       i++;
-      // console.log(key, this.goods[0][key]);
+      // console.log(key, this.good[key]);
     });
-  }
+  };
 }

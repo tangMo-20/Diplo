@@ -15,13 +15,15 @@ export class GoodItemComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    this.dynamicRender();
+  }
+
+  dynamicRender = () => {
     let i = 0;
     Object.keys(this.good).map((key: string) => {
       this.propertyArray[i] = key.replace(/[\s_]+|([a-z0-9])(?=[A-Z])/g, "$1 ");
-      this.valueArray[i] = this.good[key];
       i++;
-      // console.log(key, this.goods[0][key]);
+      // console.log(key, this.good[key]);
     });
-  }
-
+  };
 }

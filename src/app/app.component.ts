@@ -20,14 +20,27 @@ export class AppComponent implements OnInit {
   maxOnShelfAmount: number = 50;
   maxQuantity: number = 500;
 
+  goodsForNewSupply: Array<object> = [
+    {
+      id: "",
+      amount: 0,
+    }
+  ];
+
   constructor() {
 
   }
 
   ngOnInit() {
-    this.generateGoods();
-    this.mainLoop();
+    this.generateGoods(10);
+    // this.mainLoop();
   }
+
+  newSupply = (goods) => {
+    goods.map((good) => {
+      this.goods[good.id].Quantity += good.amount;
+    });
+  };
 
   getGeneralParameters = () => {
     return {
@@ -167,19 +180,20 @@ export class AppComponent implements OnInit {
     }
   };
 
-  generateGoods = () => {
+  // Функция создания записей о возможных товарах для продажи
+  generateGoods = (goodsToGenerate) => {
     let i = 0;
-    let goodsToGenerate = 10;
     while (i < goodsToGenerate) {
       this.goods[i] = new GoodsModel();
-      this.goods[i].Id = (i + 1).toString();
-      this.goods[i].Name = 'Good number ' + (i + 1);
+      this.goods[i].Id = (i).toString();
+      this.goods[i].Name = 'Good number ' + (i);
       // this.goods[i].Category = Math.floor(Math.random() * 5) + 1;
       this.goods[i].PrimeCost = Math.floor(Math.random() * 1000) + 1;
       this.goods[i].Cost = Math.floor(this.goods[i].PrimeCost * (Math.random() + 1));
       this.goods[i].ShelfLife = Math.floor(Math.random() * 20) + 1;
       this.goods[i].CurrentShelfLife = this.goods[i].ShelfLife;
-      this.goods[i].Quantity = Math.floor(this.maxQuantity / goodsToGenerate);
+      this.goods[i].Quantity = 0;
+      // this.goods[i].Quantity = Math.floor(this.maxQuantity / goodsToGenerate);
       // this.goods[i].Quantity = Math.floor(Math.random() * 50) + 1;
       this.goods[i].BuyPerDay = Math.floor(Math.random() * 10);
       this.goods[i].OnShelfAmount = Math.floor(this.maxOnShelfAmount / goodsToGenerate);
