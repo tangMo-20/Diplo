@@ -12,10 +12,12 @@ export class GoodItemComponent implements OnInit {
   propertyArray = [];
   valueArray = [];
 
+  expanded = false;
+
   constructor() { }
 
   ngOnInit() {
-    this.dynamicRender();
+    // this.dynamicRender();
   }
 
   dynamicRender = () => {

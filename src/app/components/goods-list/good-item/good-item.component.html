@@ -1,6 +1,65 @@
-<div class="good_item">
-  <div class="good_value" *ngFor="let value of valueArray">
-    <span>{{value}}</span>
-  </div>
-</div>
+<!--<div class="good_item">-->
+<!--<div class="good_value" *ngFor="let value of valueArray">-->
+<!--<span>{{value}}</span>-->
+<!--</div>-->
+<!--</div>-->
 
+<mat-expansion-panel [expanded]="expanded">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <div class="good_header">
+        <div class="good_header_item large_cont">
+          <span>{{good.Name}}</span>
+        </div>
+        <div class="good_header_item small_cont">
+          <span>Category {{good.Category}}</span>
+        </div>
+        <div class="good_header_item small_cont">
+          <span>{{good.Cost}}</span>
+        </div>
+        <div class="good_header_item small_cont">
+          <span>{{good.PrimeCost}}</span>
+        </div>
+        <div class="good_header_item small_cont">
+          <span>{{good.ShelfLife}}</span>
+        </div>
+        <div class="good_header_item small_cont">
+          <span>{{good.OnShelfAmount}}</span>
+        </div>
+        <div class="good_header_item small_cont">
+          <span>{{good.BuyPerDay}}</span>
+        </div>
+      </div>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <div class="else_info">
+    <div class="else_info_cont">
+      <div class="else_info_item">
+        <span>Batch ID</span>
+      </div>
+      <div class="else_info_item">
+        <span>Current SL</span>
+      </div>
+      <div class="else_info_item">
+        <span>Quantity</span>
+      </div>
+      <div class="else_info_item large_cont">
+        <span>Not valid for</span>
+      </div>
+    </div>
+    <div class="else_info_cont" *ngFor="let batch of good.Batches">
+      <div class="else_info_item">
+        <span>{{batch.Id}}</span>
+      </div>
+      <div class="else_info_item">
+        <span>{{batch.CurrentShelfLife}}</span>
+      </div>
+      <div class="else_info_item">
+        <span>{{batch.Quantity}}</span>
+      </div>
+      <div class="else_info_item large_cont">
+        <span>{{batch.notValidReason}}</span>
+      </div>
+    </div>
+  </div>
+</mat-expansion-panel>

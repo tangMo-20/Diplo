@@ -62,10 +62,6 @@ export class AppComponent implements OnInit {
     // Цикл, имитирующий течение времени ( по дням )
     while (this.day <= days) {
 
-      // Номер партии товаров
-      // let good_number = 0;
-      // let batch_number = 0;
-
       // TODO: **Реализовать сравнение текущей прибыли и ожидаемой ( Реализовано сравнение частных и финальной реальной и ожидаемой прибылей )
       console.log('|***| День ' + this.day + ' |***|');
 

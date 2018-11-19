@@ -1,16 +1,28 @@
 .goods_header_cont{
   display: flex;
-  justify-content: space-between;
   width: 100%;
+  padding: 0 48px 0 24px;
+  height: 48px;
 }
 
 .goods_header_item{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 1vh 0;
   font-weight: bold;
-  border: 1px solid #E0E0E0;
 }
+
+.large_cont{
+  width: 40%;
+  justify-content: flex-start;
+}
+
+.middle_cont{
+  width: 15%;
+}
+
+.small_cont{
+  width: 10%;
+}
+
 
