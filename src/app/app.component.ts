@@ -38,10 +38,28 @@ export class AppComponent implements OnInit {
     this.mainLoop(5);
   }
 
-  newSupply = (goods) => {
-    // goods.map((good) => {
-    //   this.goods[good.id].Quantity += good.amount;
-    // });
+  newSupply(goods?){
+    let batchNumber = 0;
+
+    if(arguments.length){
+      // goods.map((good) => {
+      //   this.goods[good.id].Quantity += good.amount;
+      // });
+    } else {
+      this.goods.forEach((good, goodNumber, goods) => {
+        while(batchNumber < 5){
+          good.Batches[batchNumber] = new BatchModel();
+          good.Batches[batchNumber].Id = batchNumber.toString();
+          good.Batches[batchNumber].CurrentShelfLife = Math.floor(Math.random() * 30) + 1;
+          // good.Batches[batchNumber].CurrentShelfLife = good.ShelfLife;
+          good.Batches[batchNumber].Quantity = 5;
+          good.Batches[batchNumber].isValid = true;
+          good.Batches[batchNumber].notValidReason = '-';
+          batchNumber++
+        }
+        batchNumber = 0;
+      });
+    }
   };
 
   getGeneralParameters = () => {
@@ -65,6 +83,9 @@ export class AppComponent implements OnInit {
       // TODO: **Реализовать сравнение текущей прибыли и ожидаемой ( Реализовано сравнение частных и финальной реальной и ожидаемой прибылей )
       console.log('|***| День ' + this.day + ' |***|');
 
+      // Первая поставка со стандартными значениями параметров
+      if (this.day === 1) this.newSupply();
+
       // Цикл перебора для каждого типа товара
       this.goods.forEach((good, goodNumber, goods) => {
 
@@ -73,8 +94,17 @@ export class AppComponent implements OnInit {
         // Вычисление финальной ожидаемой прибыли
         this.fullExpectedProfit += this.expectedProfit[goodNumber];
 
+        // Поиск партии товара с наименьшим сроком годности
+        let shelfLifeArr: Array<number> = good.Batches.map((batch) => {
+          return batch.CurrentShelfLife;
+        });
+        let expirationBatch: BatchModel = good.Batches[shelfLifeArr.indexOf(Math.min.apply(null, shelfLifeArr))];
+        console.log(expirationBatch);
+
         // Цикл перебора для каждой партии товаров
         good.Batches.forEach((batch, batchNumber, batches) => {
+
+
 
           // Проверка срока годности партии товаров
           // TODO: Заранее предупреждать об истекании срока годности товара ( увеличить вместимость полок )
@@ -200,6 +230,4 @@ export class AppComponent implements OnInit {
     }
     console.log(this.goods);
   };
-
-
 }
