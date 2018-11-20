@@ -34,20 +34,23 @@
   </mat-expansion-panel-header>
   <div class="else_info">
     <div class="else_info_cont">
-      <div class="else_info_item">
+      <div class="else_info_item header">
         <span>Batch ID</span>
       </div>
-      <div class="else_info_item">
+      <div class="else_info_item header">
         <span>Current SL</span>
       </div>
-      <div class="else_info_item">
+      <div class="else_info_item header">
         <span>Quantity</span>
       </div>
-      <div class="else_info_item large_cont">
-        <span>Not valid for</span>
+      <div class="else_info_item header">
+        <span>Valid</span>
+      </div>
+      <div class="else_info_item header large_cont">
+        <span>Invalidity reason</span>
       </div>
     </div>
-    <div class="else_info_cont" *ngFor="let batch of good.Batches">
+    <div class="else_info_cont" *ngFor="let batch of good.Batches, let i = index">
       <div class="else_info_item">
         <span>{{batch.Id}}</span>
       </div>
@@ -57,8 +60,11 @@
       <div class="else_info_item">
         <span>{{batch.Quantity}}</span>
       </div>
+      <div class="else_info_item">
+        <span>{{batch.isValid ? 'Yes' : 'No'}}</span>
+      </div>
       <div class="else_info_item large_cont">
-        <span>{{batch.notValidReason}}</span>
+        <span>{{this.reasonsToDisplay[i]}}</span>
       </div>
     </div>
   </div>

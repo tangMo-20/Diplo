@@ -31,6 +31,10 @@
   width: 10%;
 }
 
+.header{
+  font-weight: bold;
+}
+
 .mat-expansion-panel{
   margin: 0.2vh 0;
 }
