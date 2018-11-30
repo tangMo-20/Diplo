@@ -14,4 +14,6 @@ body{
   padding: 0;
   background: #eeeeee;
   font-size: 18px;
+  /*height: 100vh;*/
+  overflow: hidden;
 }

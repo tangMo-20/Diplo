@@ -11,6 +11,7 @@ export class AppComponent implements OnInit {
 
   day: number = 1;
   hour: number = 0;
+  // TODO: Ввести часы, как единицу времени
 
   goods: Array<GoodsModel> = [];
 
@@ -21,18 +22,11 @@ export class AppComponent implements OnInit {
   expectedProfit: Array<number> = [];
 
   maxOnShelfAmount: number = 100;
+  currentOnShelfAmount: number = 0;
   maxQuantity: number = 500;
+  currentQuantity: number = 0;
 
-  goodsForNewSupply: Array<object> = [
-    {
-      id: '',
-      amount: 0,
-    }
-  ];
-
-  constructor() {
-
-  }
+  constructor() {}
 
   ngOnInit() {
     this.generateGoods(10);
@@ -54,27 +48,41 @@ export class AppComponent implements OnInit {
       this.goods[i].ShelfLife = Math.floor(Math.random() * 14) + 1;
       this.goods[i].Batches = [];
       // this.goods[i].OnShelfAmount = Math.floor(Math.random() * 10) + 1;
+
+      this.currentOnShelfAmount += this.goods[i].OnShelfAmount;
       i++;
     }
     console.log(this.goods);
   };
 
-  newSupply(goods?) {
+  newSupply(goodID?: string, quantity?: number) {
     let batchNumber = 0;
-
     if (arguments.length) {
-      // goods.map((good) => {
-      //   this.goods[good.id].Quantity += good.amount;
-      // });
+      // Поставка новой партии конкретного товара
+      let newBatch: BatchModel = {
+        Id: this.goods[goodID].Batches.length,
+        CurrentShelfLife: this.goods[goodID].ShelfLife,
+        Quantity: quantity,
+        isValid: true,
+        notValidReason: [],
+      };
+      quantity !== 0 ?
+        this.goods[goodID].Batches.push(newBatch) : console.log('CRITICAL ERROR (Q) Попытка заказа пустой партии');
+      console.log('|*|SUPPLY|*| Поставка партии товара ' + this.goods[goodID].Name + ' в количестве ' + quantity);
     } else {
+      // Первая поставка
       this.goods.forEach((good, goodNumber, goods) => {
         good.Batches[batchNumber] = new BatchModel();
         good.Batches[batchNumber].Id = batchNumber.toString();
         good.Batches[batchNumber].CurrentShelfLife = good.ShelfLife;
-        good.Batches[batchNumber].Quantity = this.maxQuantity / goods.length;
+        good.Batches[batchNumber].Quantity = Math.floor(this.maxQuantity / goods.length);
+        // good.Batches[batchNumber].Quantity = 10;
         good.Batches[batchNumber].isValid = true;
         good.Batches[batchNumber].notValidReason = [];
+
+        this.currentQuantity += good.Batches[batchNumber].Quantity;
       });
+      console.log('|*|SUPPLY|*| Первая поставка');
     }
   };
 
@@ -92,30 +100,42 @@ export class AppComponent implements OnInit {
     };
   };
 
+  callNewSupply = (good) => {
+    let newQuantity = 0;
+    if (this.maxQuantity - this.currentQuantity) {
+      let multiplier = 0.8;
+      newQuantity = Math.floor(good.BuyPerDay * good.ShelfLife * multiplier);
+      // newQuantity = 10;
+    }
+    this.newSupply(good.Id.toString(), newQuantity);
+  };
+
   checkIsGoodEnded = (good: GoodsModel, batch: BatchModel) => {
     if (batch.Quantity < 0) {
-      console.log('CRITICAL ERROR (Q)' + good.Name, batch.Quantity);
+      console.log('CRITICAL ERROR (Q) Товар с отрицательным количеством (' + good.Name, batch.Quantity + ')');
     }
     if (batch.Quantity === 0) {
       batch.isValid = false;
-      batch.notValidReason[0] = 'Batch goods ended';
+      batch.notValidReason[0] = 'ENDED';
       console.log('|*|ENDED|*| Товар ' + good.Name + ' закончился');
+      batch.CurrentShelfLife > 1 ? this.callNewSupply(good) : null;
     }
   };
 
   checkIsGoodExpired = (good: GoodsModel, batch: BatchModel) => {
     // TODO: Заранее предупреждать об истекании срока годности товара ( увеличить вместимость полок )
     if (batch.CurrentShelfLife < 0) {
-      console.log('CRITICAL ERROR (CSL)' + good.Name, batch.CurrentShelfLife);
+      console.log('CRITICAL ERROR (CSL) Товар с отрицательным сроком годности (' + good.Name, batch.CurrentShelfLife + ')');
     }
     if (batch.CurrentShelfLife === 0) {
       batch.isValid = false;
-      batch.notValidReason[1] = 'Batch goods expired';
+      batch.notValidReason[1] = 'EXPIRED';
       this.currentProfit[+good.Id] = -1 * batch.Quantity * good.Cost;
       console.log('|*|EXPIRED|*| Партия товара ' + good.Name
         + ' в количестве ' + batch.Quantity + ' единиц, просрочилась. Потери в прибыли составили (' +
         this.currentProfit[+good.Id] + ')');
       this.profit += this.currentProfit[+good.Id];
+      batch.Quantity > 1 ? this.callNewSupply(good) : null;
       // TODO: Рекомендации по корректировке поставок товара ( поставлять меньше )
       // TODO: **Обрабатывать значение потерь в прибыли ( Реализована разница в финальных реальной и ожидаемой прибылях )
     }
@@ -129,7 +149,7 @@ export class AppComponent implements OnInit {
       console.log('|***| День ' + this.day + ' |***|');
 
       // Первая поставка со стандартными значениями параметров
-      if (this.day === 1) this.newSupply();
+      if (this.day === 1) this.newSupply(); // Первая поставка
 
       // Цикл перебора для каждого типа товара
       this.goods.forEach((good, goodNumber, goods) => {
@@ -140,11 +160,10 @@ export class AppComponent implements OnInit {
         this.fullExpectedProfit += this.expectedProfit[goodNumber];
 
         // Поиск партии товара с наименьшим сроком годности
-        let shelfLifeArr: Array<number> = good.Batches.map((batch) => {
-          return batch.CurrentShelfLife;
+        let shelfLifeArr: Array<any> = good.Batches.map((batch) => {
+          return batch.CurrentShelfLife > 0 && batch.Quantity > 0 ? batch.CurrentShelfLife : Infinity;
         });
         let batch: BatchModel = good.Batches[shelfLifeArr.indexOf(Math.min.apply(null, shelfLifeArr))];
-
         // Проверка срока годности партии товаров
         if (batch.CurrentShelfLife > 0) {
           batch.CurrentShelfLife--;
@@ -162,6 +181,7 @@ export class AppComponent implements OnInit {
           // при условии, что товара в зале хватит для покупок на день
           if (batch.Quantity >= good.OnShelfAmount && good.OnShelfAmount >= good.BuyPerDay) {
             batch.Quantity -= good.BuyPerDay;
+            this.currentQuantity -= good.BuyPerDay;
             this.currentProfit[goodNumber] = good.BuyPerDay * good.Cost;
             this.profit += this.currentProfit[goodNumber];
             this.checkIsGoodEnded(good, batch);
@@ -171,6 +191,7 @@ export class AppComponent implements OnInit {
           else if (batch.Quantity >= good.OnShelfAmount && good.OnShelfAmount < good.BuyPerDay) {
             // TODO: Рекомендация по увеличению количества товаров на полках в зале
             batch.Quantity -= good.OnShelfAmount;
+            this.currentQuantity -= good.OnShelfAmount;
             this.currentProfit[goodNumber] = good.OnShelfAmount * good.Cost;
             this.profit += this.currentProfit[goodNumber];
             this.checkIsGoodEnded(good, batch);
@@ -180,14 +201,17 @@ export class AppComponent implements OnInit {
             // Ситуация, когда товара со склада хватит, чтобы удовлетворить потребности в товаре
             if (batch.Quantity >= good.BuyPerDay) {
               batch.Quantity -= good.BuyPerDay;
+              this.currentQuantity -= good.BuyPerDay;
               this.currentProfit[goodNumber] = good.BuyPerDay * good.Cost;
               this.profit += this.currentProfit[goodNumber];
               this.checkIsGoodEnded(good, batch);
             }
             // Ситуация, когда товара со склада меньше, чем потребности в товаре
             else if (batch.Quantity < good.BuyPerDay) {
+              this.currentQuantity -= batch.Quantity;
               this.currentProfit[goodNumber] = batch.Quantity * good.Cost;
               this.profit += this.currentProfit[goodNumber];
+              batch.Quantity = 0;
               this.checkIsGoodEnded(good, batch);
             }
           }
@@ -197,7 +221,7 @@ export class AppComponent implements OnInit {
           batch.notValidReason.forEach((reason) => {
             if (reason) reasons += reason + ' ';
           });
-          console.log('|*|INVALID|*| Партия товара ' + good.Name + ' невалидна, т.к - ' + reasons);
+          console.log('|*|INVALID|*| Партия товара ' + good.Name + ' под номером ' + batch.Id + ' невалидна, т.к - ' + reasons);
         }
 
         // Сравнение реальной частной прибыли для конкретного типа товара с ожидаемой частной прибылью

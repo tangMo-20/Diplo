@@ -1,8 +1,8 @@
 .goods_header_cont{
   display: flex;
   width: 100%;
-  padding: 0 48px 0 24px;
-  height: 48px;
+  padding: 0 68px 0 24px;
+  height: 50px;
 }
 
 .goods_header_item{

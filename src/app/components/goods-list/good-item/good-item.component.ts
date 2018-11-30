@@ -43,7 +43,7 @@ export class GoodItemComponent implements OnInit {
 
     this.reasonsToDisplay = this.reasonsArray.map((batchReasons, index) => {
       if(batchReasons[index]){
-        return batchReasons.join(' | ');
+        return batchReasons.join(' ');
       } else {
         return batchReasons.join(' ');
       }
