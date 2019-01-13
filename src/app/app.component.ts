@@ -26,7 +26,8 @@ export class AppComponent implements OnInit {
   maxQuantity: number = 500;
   currentQuantity: number = 0;
 
-  constructor() {}
+  constructor() {
+  }
 
   ngOnInit() {
     this.generateGoods(10);
@@ -101,13 +102,19 @@ export class AppComponent implements OnInit {
   };
 
   callNewSupply = (good) => {
-    let newQuantity = 0;
-    if (this.maxQuantity - this.currentQuantity) {
-      let multiplier = 0.8;
-      newQuantity = Math.floor(good.BuyPerDay * good.ShelfLife * multiplier);
-      // newQuantity = 10;
+    let ready = false;
+    let availableQuantity = this.maxQuantity - this.currentQuantity;
+    let multiplier = 0.9;
+    let newQuantity = Math.floor(good.BuyPerDay * good.ShelfLife * multiplier);
+    // newQuantity = 10;
+    while (!ready) {
+      if (newQuantity > availableQuantity) {
+        newQuantity *= multiplier
+      } else {
+        ready = true;
+        this.newSupply(good.Id.toString(), newQuantity);
+      }
     }
-    this.newSupply(good.Id.toString(), newQuantity);
   };
 
   checkIsGoodEnded = (good: GoodsModel, batch: BatchModel) => {
@@ -211,6 +218,7 @@ export class AppComponent implements OnInit {
               this.currentQuantity -= batch.Quantity;
               this.currentProfit[goodNumber] = batch.Quantity * good.Cost;
               this.profit += this.currentProfit[goodNumber];
+              // TODO: Продажа товаров из другой партии
               batch.Quantity = 0;
               this.checkIsGoodEnded(good, batch);
             }
@@ -242,15 +250,15 @@ export class AppComponent implements OnInit {
       this.day++;
     }
 
-    // Сравнение финальной реальной прибыли товара с финальной ожидаемой
-    // TODO: Представлять разницу в реальной и ожидаемой прибыли более наглядно ( в процентах )
-    if (this.profit === this.fullExpectedProfit) {
-      console.log('|*|FINAL PROFIT|*| Финальная реальная прибыль (' + this.profit + ') совпала с ожидаемой');
-    } else if (this.profit < this.fullExpectedProfit) {
-      this.fullDifference = this.fullExpectedProfit - this.profit;
-      console.log('|*|FINAL PROFIT|*| Финальная реальная прибыль (' + this.profit + ') оказалась меньше ожидаемой (' +
-        this.fullExpectedProfit + '), разница составила (' + this.fullDifference + ')');
-    }
+    // // Сравнение финальной реальной прибыли товара с финальной ожидаемой
+    // // TODO: Представлять разницу в реальной и ожидаемой прибыли более наглядно ( в процентах )
+    // if (this.profit === this.fullExpectedProfit) {
+    //   console.log('|*|FINAL PROFIT|*| Финальная реальная прибыль (' + this.profit + ') совпала с ожидаемой');
+    // } else if (this.profit < this.fullExpectedProfit) {
+    //   this.fullDifference = this.fullExpectedProfit - this.profit;
+    //   console.log('|*|FINAL PROFIT|*| Финальная реальная прибыль (' + this.profit + ') оказалась меньше ожидаемой (' +
+    //     this.fullExpectedProfit + '), разница составила (' + this.fullDifference + ')');
+    // }
   };
 
 
